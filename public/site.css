@@ -4,6 +4,10 @@
 /* ---------- the hero: the mark set in the headline, the window on an ember field ---------- */
 
 .hero-mark { width: .78em; height: .78em; vertical-align: -.05em; margin-inline: .04em; background: var(--accent); }
+/* the week wave: seven contribution squares riding one swell (drawn by tools/logo.py). The mask is
+   cropped to the squares, so the box is wider than tall. */
+.mark[data-mark="wave"] { --mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='1.5 6.25 20.5 11.5'%3E%3Crect x='1.5' y='10.75' width='2.5' height='2.5' rx='.6'/%3E%3Crect x='4.5' y='6.25' width='2.5' height='2.5' rx='.6'/%3E%3Crect x='7.5' y='6.25' width='2.5' height='2.5' rx='.6'/%3E%3Crect x='10.5' y='10.75' width='2.5' height='2.5' rx='.6'/%3E%3Crect x='13.5' y='15.25' width='2.5' height='2.5' rx='.6'/%3E%3Crect x='16.5' y='15.25' width='2.5' height='2.5' rx='.6'/%3E%3Crect x='19.5' y='10.75' width='2.5' height='2.5' rx='.6'/%3E%3C/svg%3E"); width: 28px; height: 16px; }
+.hero-mark[data-mark="wave"] { width: 1.15em; height: .65em; vertical-align: .02em; margin-inline: .02em .1em; }
 
 /* the lit frame takes Timeline's own colours, so the effect is an ember field and the window stays dark on it */
 .hero--centred .hero__window {
