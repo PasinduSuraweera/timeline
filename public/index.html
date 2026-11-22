@@ -1,121 +1,285 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-type="software" data-radius="sharp" data-buttons="solid" data-motion>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Timeline</title>
-<meta name="description" content="Turn a GitHub contribution calendar into an animated wave for your profile README.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2302070A'/><path d='M0 10h2v1H0zM2 9h2v1H2zM4 7h2v1H4zM6 6h2v1H6zM8 7h2v1H8zM10 9h2v1h-2zM12 10h2v1h-2zM14 10h2v1h-2z' fill='%23FF6A3D'/></svg>">
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timeline: animated contribution header for GitHub profiles</title>
+<meta name="description" content="One line of Markdown puts your last 52 weeks on your GitHub README as a scrolling pixel wave, redrawn from your calendar on every request.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Timeline: animated contribution header for GitHub profiles">
+<meta property="og:description" content="Your last 52 weeks as a scrolling pixel wave, from one line of Markdown.">
+<meta property="og:image" content="share.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#02070a">
+<!-- <link rel="canonical" href="https://timeline-readme.vercel.app/"> once the domain is final -->
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<link rel="preload" href="fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-weight: 400 700; font-stretch: 75% 100%; font-display: swap; src: url(fonts/instrument-sans.woff2) format("woff2"); }
+@font-face { font-family: "DM Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/dm-mono-400.woff2) format("woff2"); }
+@font-face { font-family: "DM Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/dm-mono-500.woff2) format("woff2"); }
+</style>
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<style>
+:root {
+  --p-bg: #02070a; --p-surface: #071017; --p-ink: #e6edf2; --p-muted: #95a2ad;
+  --p-accent: #ff6a3d; --p-accent-ink: #02070a; --p-action: #ff6a3d; --p-action-ink: #02070a;
+  --p-inv-bg: #e6edf2; --p-inv-surface: #d3dadf; --p-inv-ink: #02070a; --p-inv-muted: #4a5257;
+  --p-inv-accent: #02070a; --p-inv-accent-ink: #e6edf2; --p-inv-action: #02070a; --p-inv-action-ink: #e6edf2;
+  --font-display: "Instrument Sans", system-ui, sans-serif;
+  --font-text: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.028em;
+  --display-tracking-xl: -0.036em;
+  --display-stretch: 96%;
+  --ly-scale: 1.04;
+}
+</style>
+<link rel="stylesheet" href="assets/ui/base.css">
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script src="assets/backgrounds/backgrounds.js"></script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="assets/moments/moments.js">
+<link rel="modulepreload" href="assets/moments/lib.js">
+<link rel="modulepreload" href="assets/moments/pinned-chapters/moment.js">
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
+<!-- type: software (a developer tool: an animated GitHub contribution header)
+     deal: hero centred, nav nav-mega, close close-word, footer footer-dark, rhythm surface-pairs,
+     buttons solid, mark ring, radius sharp, type instrument (Instrument Sans + DM Mono),
+     palette: Timeline's own colours through start.mjs brand (near-black #02070a, ink #e6edf2,
+     ember #ff6a3d) in place of the dealt forest-pale-lime, because every wave the product draws is
+     ember by default and a lime page would fight each picture of it.
+     effect: gradient-mesh in the hero frame, on an ember ground. grounds: none.
+     moments: pinned-chapters in #how.
+     screens: hero 1, make 1, how 2 (the moment), faq 1 (the surface band), footer.closing 1. -->
 
-<header class="topbar">
-  <a class="mark" href="./">time<span>line</span></a>
-  <nav>
-    <a href="https://github.com/PasinduSuraweera/timeline">Source</a>
-    <a href="https://github.com/PasinduSuraweera/timeline#settings">Docs</a>
-  </nav>
+<header class="nav">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Skip to content</a>
+    <a class="nav__logo" href="#top"><span class="mark" data-mark="ring" aria-hidden="true"></span>Timeline</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item">
+        <a class="nav__link" href="#make">Product <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav__menu">
+          <div class="wrap grid">
+            <div class="menu-col span-3">
+              <p class="t-label">Configure</p>
+              <a href="#themes">Themes<span>Nine looks or your own hex</span></a>
+              <a href="#riders">Riders<span>Surfer, sail, buoy or flag</span></a>
+              <a href="#sliders">Size and speed<span>Width, pixels and loop time</span></a>
+            </div>
+            <div class="menu-col span-3">
+              <p class="t-label">Use it</p>
+              <a href="#output">Snippets<span>Markdown, HTML or an Action</span></a>
+              <a href="#faq-host">Self-hosting<span>Your own copy on Vercel</span></a>
+            </div>
+            <a class="menu-card span-3 start-10" href="#preview">
+              <div class="panel menu-wave"><img class="frame__img" src="img/step-wave.svg" alt="A pixel wave with a surfer on its crest" loading="lazy"></div>
+              <span class="t-card">Live preview</span>
+              <span class="t-small muted">Redrawn as you change it</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="nav__item"><a class="nav__link" href="#how">Steps</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link" href="https://github.com/PasinduSuraweera/timeline">GitHub</a>
+      <a class="btn btn--primary" href="#make">Get your wave</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
 </header>
 
-<main>
+<main id="top">
 
-  <section class="intro rise" style="--rise-delay:0ms">
-    <h1>Your contribution year, as a wave you can ride.</h1>
-    <p>Timeline turns every week of your calendar into one swell. Put your username in,
-       pick a look, and paste the line into your profile README. It redraws itself as you commit.</p>
+  <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c">
+        <a class="pill" href="#how"><span>Free and MIT licensed</span><span class="muted">See how it is drawn</span></a>
+        <h1 id="hero-h" aria-label="Animated GitHub contribution header"><span class="mark hero-mark" data-mark="ring" aria-hidden="true"></span> Animated GitHub contribution header</h1>
+        <p class="hero__lead">Each of your last 52 weeks becomes one swell in a single SVG. Paste one line into your profile README and it redraws as you commit.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="#make">Get your wave<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="https://github.com/PasinduSuraweera/timeline">Read the source</a></div>
+      </div>
+      <div class="hero__window" data-fx="gradient-mesh" data-fx-seed="41" data-fx-params='{"tint":0.7,"calm":0.2}'>
+        <div class="ly-piece tl-win" role="img" aria-label="Timeline reading PasinduSuraweera's calendar and drawing it as a wave, with the line to paste under it">
+          <div class="tl-win__bar"><span class="tl-win__dots"><i></i><i></i><i></i></span><span><b>Timeline</b> · PasinduSuraweera</span><span class="tl-sp"></span><span>ember · surfer</span></div>
+          <div class="tl-win__body">
+            <div class="tl-side">
+              <span class="is-on"><b>Theme</b><em>ember</em></span>
+              <span><b>Rider</b><em>surfer</em></span>
+              <span><b>Width</b><em>880 px</em></span>
+              <span><b>Loop</b><em>33 s</em></span>
+              <span><b>History</b><em>52 weeks</em></span>
+            </div>
+            <div class="tl-run" data-ly-steps="900">
+              <div class="tl-user">PasinduSuraweera</div>
+              <div class="tl-tool" data-step>Reading 52 weeks of the public calendar</div>
+              <div class="tl-wave" data-step><picture><source media="(prefers-reduced-motion: reduce)" srcset="/api/timeline?user=PasinduSuraweera&amp;width=640&amp;height=96&amp;still=1"><img class="js-wave" src="/api/timeline?user=PasinduSuraweera&amp;width=640&amp;height=96" width="640" height="96" alt=""></picture></div>
+              <div class="tl-line" data-step><code>![](timeline-readme.vercel.app/PasinduSuraweera.svg)</code><span>Copy</span></div>
+            </div>
+          </div>
+        </div>
+        <button class="loop-pause js-pause" type="button" aria-pressed="false" aria-label="Pause the wave"><svg viewBox="0 0 14 14" aria-hidden="true"><path class="i-pause" d="M3 2h3v10H3zM8 2h3v10H8z"/><path class="i-play" d="M3 1.5v11l9-5.5z"/></svg></button>
+      </div>
+    </div></div>
   </section>
 
-  <section class="stage rise" style="--rise-delay:60ms">
-    <div class="frame" id="frameWrap">
-      <img id="preview" alt="Live preview of the contribution wave">
+  <section class="section" id="make" style="--hm: 2" aria-labelledby="make-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <h2 id="make-h" class="span-5">Set up your wave beside a live preview</h2>
+        <p class="span-6 start-7 make__intro">Type a GitHub username, pick a theme and a rider, then set the size and speed. The line under the preview is ready for your README. <a class="link" href="https://github.com/PasinduSuraweera/timeline#readme">Read the README</a></p>
+      </div>
+      <div class="ui app fill" role="region" aria-label="Timeline settings and preview">
+        <div class="app__pane app__pane--list cfg-side">
+          <div class="cfg-bar"><span class="cfg-dots" aria-hidden="true"><i></i><i></i><i></i></span><b>Settings</b></div>
+          <div class="cfg-body">
+            <div class="cfg-field">
+              <label class="cfg-label" for="user">GitHub username</label>
+              <input id="user" class="cfg-input" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off" placeholder="octocat">
+            </div>
+            <div class="cfg-field">
+              <span class="cfg-label" id="themes-l">Theme</span>
+              <div class="cfg-chips" id="themes" role="radiogroup" aria-labelledby="themes-l"></div>
+              <div class="cfg-accent">
+                <label class="cfg-swatchpick" for="accent"><input id="accent" type="color" value="#ff6a3d"><span>Own colour</span></label>
+                <label class="cfg-hexpick" for="accentHex"><span>Hex</span><input id="accentHex" class="cfg-input cfg-input--hex" type="text" spellcheck="false" placeholder="#ff6a3d" maxlength="7"></label>
+                <button class="cfg-chip cfg-chip--plain" id="accentClear" type="button">Use the theme's accent</button>
+              </div>
+            </div>
+            <div class="cfg-field">
+              <span class="cfg-label" id="riders-l">Rider</span>
+              <div class="cfg-chips" id="riders" role="radiogroup" aria-labelledby="riders-l"></div>
+            </div>
+            <div class="cfg-sliders" id="sliders"></div>
+            <div class="cfg-field">
+              <span class="cfg-label" id="toggles-l">Details</span>
+              <div class="cfg-chips" id="toggles" role="group" aria-labelledby="toggles-l"></div>
+            </div>
+          </div>
+        </div>
+        <div class="app__pane app__pane--open cfg-main" id="preview">
+          <div class="cfg-bar"><b>Preview</b><span class="cfg-status" id="status" role="status">Loading the sample swell.</span></div>
+          <div class="cfg-stage" id="frameWrap"><img id="previewImg" class="js-wave" alt="Live preview of the contribution wave"><button class="loop-pause js-pause" type="button" aria-pressed="false" aria-label="Pause the wave"><svg viewBox="0 0 14 14" aria-hidden="true"><path class="i-pause" d="M3 2h3v10H3zM8 2h3v10H8z"/><path class="i-play" d="M3 1.5v11l9-5.5z"/></svg></button></div>
+          <div class="cfg-out" id="output">
+            <div class="tabs" id="tabsWrap">
+              <div class="tabs-row" id="tabs" role="tablist" aria-label="Snippet format"></div>
+              <div class="tabs-row tabs-row-active" id="tabsActive" aria-hidden="true"></div>
+            </div>
+            <div class="cfg-code">
+              <pre id="snippet" tabindex="0"></pre>
+              <button class="cfg-copy" id="copy" type="button"><span class="copy-label" id="copyLabel">Copy</span></button>
+            </div>
+            <p class="cfg-hint" id="hint"></p>
+          </div>
+        </div>
+      </div>
     </div>
-    <p class="status" id="status" role="status">Loading the sample swell.</p>
   </section>
 
-  <section class="panel rise" style="--rise-delay:110ms">
-
-    <div class="row row-user">
-      <label class="lab" for="user">GitHub username</label>
-      <input id="user" type="text" spellcheck="false" autocapitalize="off" autocorrect="off"
-             autocomplete="off" placeholder="octocat">
-    </div>
-
-    <div class="row">
-      <span class="lab">Theme</span>
-      <div class="swatches" id="themes" role="radiogroup" aria-label="Theme"></div>
-    </div>
-
-    <div class="row">
-      <label class="lab" for="accent">Custom accent</label>
-      <div class="accent-row">
-        <input id="accent" type="color" value="#ff6a3d" aria-label="Accent colour">
-        <input id="accentHex" type="text" spellcheck="false" placeholder="auto" maxlength="7">
-        <button class="ghost" id="accentClear" type="button">Use theme colour</button>
+  <section class="section" id="how" style="--h: 2" data-moment="pinned-chapters" aria-labelledby="how-h">
+    <div class="wrap mo-pc__grid">
+      <div class="mo-pc__text">
+        <h2 id="how-h">How a year becomes a wave</h2>
+        <ol class="mo-pc__steps">
+          <li class="mo-pc__step">
+            <h3><span class="step-n">01</span>Reads 52 weeks of your calendar</h3>
+            <p>Timeline reads your public GitHub calendar, or exact daily counts when the deployment has a token.</p>
+            <figure class="mo-pc__visual"><img src="img/step-calendar.svg" alt="A year of contribution days as a grid of squares, brighter on busier days" width="1200" height="900"></figure>
+          </li>
+          <li class="mo-pc__step">
+            <h3><span class="step-n">02</span>Adds each week into one contribution total</h3>
+            <p>Days are summed by week. The week still running is left out, so it never shows as a dip.</p>
+            <figure class="mo-pc__visual"><img src="img/step-weeks.svg" alt="52 bars, one per week, tall in spring and late in the year" width="1200" height="900"></figure>
+          </li>
+          <li class="mo-pc__step">
+            <h3><span class="step-n">03</span>Smooths the totals into the wave</h3>
+            <p>A soft blur turns spikes into swell, the two ends meet for the loop, and a rider steps along the crest.</p>
+            <figure class="mo-pc__visual"><img src="img/step-wave.svg" alt="The same year drawn as a pixel wave with a surfer on the crest" width="1200" height="900"></figure>
+          </li>
+        </ol>
       </div>
+      <div class="mo-pc__visuals frame"></div>
     </div>
-
-    <div class="row">
-      <span class="lab">Rider</span>
-      <div class="segmented" id="riders" role="radiogroup" aria-label="Rider"></div>
-    </div>
-
-    <div class="grid" id="sliders"></div>
-
-    <div class="row">
-      <span class="lab">Details</span>
-      <div class="segmented" id="toggles"></div>
-    </div>
-
   </section>
 
-  <section class="output rise" style="--rise-delay:150ms">
-    <div class="tabs" id="tabsWrap">
-      <div class="tabs-row" id="tabs" role="tablist"></div>
-      <div class="tabs-row tabs-row-active" id="tabsActive" aria-hidden="true"></div>
+  <section class="section ground-surface" id="faq" style="--hm: 2" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="grid grid--top">
+        <div class="span-5 stack-4">
+          <h2 id="faq-h">Questions</h2>
+          <p class="faq__intro">About tokens, caching and running your own copy.</p>
+          <p><a class="link" href="https://github.com/PasinduSuraweera/timeline/issues">Ask on GitHub</a></p>
+          <figure class="faq__card" role="img" aria-label="A GitHub Actions workflow step that runs Timeline once a day and commits the SVG to your profile">
+            <div class="tl-win faq__win" aria-hidden="true">
+              <div class="tl-win__bar"><span class="tl-win__dots"><i></i><i></i><i></i></span><span>.github/workflows/wave.yml</span></div>
+<pre class="faq__yml"><span class="y-k">on</span>:
+  <span class="y-k">schedule</span>: [{ <span class="y-k">cron</span>: <span class="y-s">"0 0 * * *"</span> }]
+<span class="y-k">steps</span>:
+  - <span class="y-k">uses</span>: <span class="y-s">PasinduSuraweera/timeline@main</span>
+    <span class="y-k">with</span>:
+      <span class="y-k">user</span>: <span class="y-s">your-username</span>
+      <span class="y-k">theme</span>: <span class="y-s">ember</span></pre>
+            </div>
+          </figure>
+        </div>
+        <div class="faq span-7 start-6">
+          <div class="faq__item"><h3>How often does the wave change?</h3><p>Each request draws it again from your calendar. Timeline caches a wave for 30 minutes, and GitHub keeps its own copy of README images for a while on top.</p></div>
+          <div class="faq__item"><h3>Do I need a GitHub token or an account?</h3><p>No. Timeline reads the public calendar anyone can see on your profile. A copy you host with a GitHub token reads exact daily counts instead.</p></div>
+          <div class="faq__item"><h3>Are private contributions counted?</h3><p>Only when your profile shows them. Turn on private contributions in your GitHub profile settings and they join the wave.</p></div>
+          <div class="faq__item" id="faq-host"><h3>Can I run my own copy of Timeline?</h3><p>Yes. The renderer is standard-library Python with no dependencies. Deploy the repository to Vercel, or let the GitHub Action commit the SVG to your profile once a day.</p></div>
+        </div>
+      </div>
     </div>
-    <div class="code">
-      <pre id="snippet" tabindex="0"></pre>
-      <button class="copy" id="copy" type="button"><span class="copy-label" id="copyLabel">Copy</span></button>
-    </div>
-    <p class="hint" id="hint"></p>
-  </section>
-
-  <section class="notes">
-    <h2>Worth knowing</h2>
-    <dl>
-      <div>
-        <dt>It updates on its own</dt>
-        <dd>The image is generated per request, so the wave follows your calendar.
-          GitHub caches README images for a while, which is why a fresh commit takes
-          a little time to show up in the water.</dd>
-      </div>
-      <div>
-        <dt>Counts and levels</dt>
-        <dd>With a token the renderer reads exact daily counts. Without one it falls back
-          to the public calendar, which sometimes exposes only the five shading levels.
-          The wave keeps its shape either way.</dd>
-      </div>
-      <div>
-        <dt>Motion</dt>
-        <dd>Anyone browsing with reduced motion turned on gets a still frame, not a scroll.</dd>
-      </div>
-      <div>
-        <dt>Run it yourself</dt>
-        <dd>The whole renderer is standard-library Python with no dependencies. Deploy your
-          own copy, or use the Action tab to commit the SVG into your repo on a schedule
-          and skip the hosting entirely.</dd>
-      </div>
-    </dl>
   </section>
 
 </main>
 
-<footer>
-  <span>Built from the header on <a href="https://github.com/PasinduSuraweera">PasinduSuraweera</a>'s profile.</span>
-  <span>MIT licensed.</span>
+<footer class="footer closing footer--dark ground-inverse" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head--split">
+        <div><h2 id="close-h">Put your year on your profile</h2><p class="t-lead">Free, no sign-up, one line of Markdown.</p></div>
+        <a class="btn btn--primary" href="#make">Get your wave<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+      </div>
+      <p class="close__word" aria-hidden="true">Timeline</p>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="#top"><span class="mark" data-mark="ring" aria-hidden="true"></span>Timeline</a>
+          <p class="footer__lede">Contribution waves for GitHub profiles.</p>
+        </div>
+        <div class="span-2 footer__col"><h3>Product</h3><ul><li><a href="#themes">Themes</a></li><li><a href="#output">Snippets</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Steps</h3><ul><li><a href="#how">How it is drawn</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Questions</h3><ul><li><a href="#faq">Tokens and caching</a></li><li><a href="#faq-host">Self-hosting</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Code</h3><ul><li><a href="https://github.com/PasinduSuraweera/timeline">Source</a></li><li><a href="https://github.com/PasinduSuraweera/timeline/issues">Issues</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Timeline &nbsp; MIT licensed &nbsp; Built by <a href="https://github.com/PasinduSuraweera">PasinduSuraweera</a>.</span>
+        <div class="socials"></div>
+      </div>
+    </div>
+  </div>
 </footer>
 
-<script src="app.js"></script>
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
+<script src="app.js" defer></script>
 </body>
 </html>

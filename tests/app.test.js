@@ -51,7 +51,7 @@ function makeDom(hash) {
     return node;
   }
 
-  const ids = ["preview", "status", "user", "themes", "accent", "accentHex",
+  const ids = ["previewImg", "preview", "status", "user", "themes", "accent", "accentHex",
                "accentClear", "riders", "sliders", "toggles", "tabs", "tabsWrap",
                "tabsActive", "snippet", "copy", "copyLabel", "hint", "frameWrap"];
   ids.forEach(function (i) { const n = el("div"); n.id = i; });
@@ -162,7 +162,7 @@ check("action snippet carries the chosen settings", yaml, (s) => s.includes("wid
 check("action snippet omits defaults", yaml, (s) => !s.includes("theme: ember"));
 
 /* ---------- the sliding tab highlight ---------- */
-byId.tabs.offsetWidth = 400;                 // four 100px tabs
+byId.tabs.offsetWidth = 400; byId.tabsActive.offsetWidth = 400;   // four 100px tabs
 byId.tabs.children[1].onclick();
 check("highlight clips to the chosen tab", byId.tabsActive.style.clipPath,
       "inset(0 200px 0 100px)");

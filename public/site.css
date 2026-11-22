@@ -1,0 +1,228 @@
+/* Timeline: page CSS. Only what sits inside a visual and the kit lacks (sections-library.md):
+   the hero's drawn window, the app frame's recipe, and the live configurator inside it. */
+
+/* ---------- the hero: the mark set in the headline, the window on an ember field ---------- */
+
+.hero-mark { width: .78em; height: .78em; vertical-align: -.05em; margin-inline: .04em; background: var(--accent); }
+
+/* the lit frame takes Timeline's own colours, so the effect is an ember field and the window stays dark on it */
+.hero--centred .hero__window {
+  --ground-bg: #7a2a10; --ground-surface: #c24a22; --ground-ink: #ffd0ae; --ground-muted: #8b98a4; --ground-accent: #ff9a58;
+}
+
+.tl-win { background: #0b141a; color: #e6edf2; border-radius: 12px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 30px 70px -30px rgb(0 0 0 / .8);
+  font: 400 14px/1.4 var(--font-text); }
+.tl-win__bar { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px;
+  border-bottom: 1px solid rgb(255 255 255 / .07); font-size: 13px; color: #9aa4ad; }
+.tl-win__bar b { color: #e6edf2; font-weight: 500; }
+.tl-win__dots { display: flex; gap: 6px; } .tl-win__dots i { width: 10px; height: 10px; border-radius: 50%; background: #2b3640; }
+.tl-sp { flex: 1; }
+.tl-win__body { display: grid; grid-template-columns: 168px minmax(0, 1fr); min-height: 380px; }
+.tl-side { display: grid; align-content: start; gap: 2px; padding: 12px 8px; border-right: 1px solid rgb(255 255 255 / .07); font-size: 13px; }
+.tl-side span { display: flex; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 6px; color: #9aa4ad; }
+.tl-side b { font-weight: 500; color: #e6edf2; }
+.tl-side em { font-style: normal; font-family: var(--font-mono); font-size: 12px; }
+.tl-side .is-on { background: rgb(255 255 255 / .06); }
+.tl-side .is-on em { color: #ff9a58; }
+.tl-run { display: grid; gap: 10px; align-content: start; padding: 16px 18px; }
+.tl-user { justify-self: start; padding: 8px 12px; border-radius: 8px; background: #e6edf2; color: #02070a;
+  font: 500 13px/1.2 var(--font-mono); }
+.tl-tool { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9aa4ad; }
+.tl-tool::before { content: ""; width: 12px; height: 12px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; }
+.tl-wave { border-radius: 8px; overflow: hidden; background: #02070a; line-height: 0; }
+.tl-wave img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.tl-line { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.tl-line code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 7px 10px; border-radius: 6px; background: rgb(255 255 255 / .05); font: 400 12px/1.4 var(--font-mono); color: #c9d2d9; }
+.tl-line span { flex: none; padding: 6px 12px; border-radius: 6px; background: #ff6a3d; color: #02070a; font-size: 13px; font-weight: 500; }
+/* the pause button over the hero's window and the preview: the kit's disc (ui/base.css), its icon swapped by state */
+.hero__window, .cfg-stage { position: relative; }
+.js-pause .i-play, .js-pause[aria-pressed="true"] .i-pause { display: none; }
+.js-pause[aria-pressed="true"] .i-play { display: inline; }
+/* below the desktop the window drops its settings column and the line to paste wraps instead of being cut */
+@media (max-width: 1023px) {
+  .tl-win__body { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .tl-side { display: none; }
+  .tl-line code { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+}
+@media (max-width: 639px) {
+  .tl-win__bar > span:nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tl-win__bar > span:last-child, .tl-sp { display: none; }
+  /* the pill runs line to line on a phone, as every box over half the column does (SR-6) */
+  .hero--centred .pill { width: 100%; justify-content: center; }
+}
+
+/* ---------- the menu card in the nav's panel: the wave still on its own ground ---------- */
+.menu-wave { background: #071017; }
+.menu-wave .frame__img { object-fit: cover; }
+
+/* ---------- the app frame (sections-library.md, app-frame), live ---------- */
+.make__intro { color: var(--muted); }
+.app.ui { --fx-bg: #071017; --fx-surface: #0b141a;
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin-top: var(--s-7);
+  background: var(--u-bg); border: 1px solid var(--u-border); border-radius: var(--u-r); box-shadow: var(--u-shadow);
+  color: var(--u-ink); font: 400 13px/1.45 var(--font-text); }
+.app > .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.app > .app__pane + .app__pane { border-left: 1px solid var(--u-line); }
+@media (min-width: 1024px) and (max-width: 1279px) { .app.ui { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); } }
+
+.cfg-bar { display: flex; align-items: center; gap: 10px; flex: none; height: 40px; padding: 0 16px;
+  border-bottom: 1px solid var(--u-line); font-size: 13px; color: var(--u-muted); }
+.cfg-bar b { font-weight: 500; color: var(--u-ink); }
+.cfg-dots { display: flex; gap: 6px; } .cfg-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--u-line); }
+
+.cfg-body { display: grid; gap: 14px; align-content: start; padding: 16px;
+  /* a short screen (1024x768, 1280x800) cannot hold every control beside the preview: the settings column scrolls,
+     as an app's side panel does, rather than cutting the last controls off */
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--u-border) transparent; }
+.cfg-field { display: grid; gap: 8px; }
+.cfg-label { font: 500 12px/1 var(--font-text); color: var(--u-muted); }
+.cfg-input { width: 100%; max-width: 320px; height: 36px; padding: 0 10px; border-radius: 6px;
+  border: 1px solid var(--u-border); background: var(--u-fill); color: var(--u-ink); font: 400 13px/1 var(--font-mono); }
+.cfg-input:focus { outline: none; border-color: var(--u-accent); }
+.cfg-input::placeholder { color: var(--u-muted); }
+.cfg-input--hex { width: 104px; }
+
+.cfg-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cfg-chip { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--u-border); background: var(--u-fill); color: var(--u-muted); font: 400 12px/1 var(--font-mono);
+  transition: transform 160ms var(--ease-out, cubic-bezier(.23, 1, .32, 1)), color 200ms ease, border-color 200ms ease; }
+.cfg-chip:active { transform: scale(0.97); }
+.cfg-chip[aria-checked="true"], .cfg-chip[aria-pressed="true"] { border-color: var(--u-accent); color: var(--u-ink); }
+.cfg-chip--plain { background: none; }
+.cfg-swatch i { width: 10px; height: 10px; flex: none; border-radius: 2px; outline: 1px solid var(--u-border); }
+@media (hover: hover) and (pointer: fine) { .cfg-chip:hover { color: var(--u-ink); } }
+
+.cfg-accent { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.cfg-swatchpick, .cfg-hexpick { display: inline-flex; align-items: center; gap: 8px; height: 30px; cursor: pointer;
+  font: 400 12px/1 var(--font-mono); color: var(--u-muted); }
+.cfg-swatchpick { padding-right: 6px; }
+.cfg-accent input[type=color] { width: 36px; height: 30px; padding: 0; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--u-border); background: var(--u-fill); }
+
+.cfg-sliders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 16px; }
+.cfg-slider { display: grid; gap: 2px; }
+.cfg-slider__head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.cfg-slider__val { font: 400 12px/1 var(--font-mono); color: var(--u-ink); font-variant-numeric: tabular-nums; }
+.cfg-slider input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; margin: 0; background: none; cursor: pointer; }
+.cfg-slider input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--u-border); }
+.cfg-slider input[type=range]::-moz-range-track { height: 1px; background: var(--u-border); }
+.cfg-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 9px; height: 16px; margin-top: -8px;
+  border: 0; border-radius: 1px; background: var(--u-accent); transition: transform 160ms cubic-bezier(.23, 1, .32, 1); }
+.cfg-slider input[type=range]::-moz-range-thumb { width: 9px; height: 16px; border: 0; border-radius: 1px; background: var(--u-accent); }
+.cfg-slider input[type=range]:active::-webkit-slider-thumb { transform: scaleY(1.25); }
+
+.cfg-status { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: 400 12px/1 var(--font-mono); color: var(--u-muted); font-variant-numeric: tabular-nums; }
+.cfg-status.ok { color: var(--u-ink); }
+.cfg-status.warn { color: var(--u-accent); }
+
+/* the preview: one render replaced by the next; a little blur bridges the two so it reads as one shape settling */
+.cfg-stage { flex: none; display: flex; align-items: center; justify-content: center; min-height: 148px; padding: 16px;
+  background: #02070a; border-bottom: 1px solid var(--u-line); }
+.cfg-stage img { display: block; max-width: 100%; height: auto; transition: filter 200ms ease, opacity 200ms ease; }
+.cfg-stage img:not([src]) { visibility: hidden; }
+.cfg-stage.busy img { filter: blur(3px); opacity: .55; }
+
+.cfg-out { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+/* two identical rows: the lower one, styled as active, is clipped to the chosen tab, so moving the clip slides the
+   highlight and turns the label at the same edge */
+.tabs { position: relative; flex: none; border-bottom: 1px solid var(--u-line); overflow: hidden; }
+.tabs-row { display: flex; }
+.tabs-row-active { position: absolute; inset: 0; pointer-events: none; background: var(--u-fill);
+  clip-path: inset(0 100% 0 0); transition: clip-path 260ms cubic-bezier(.77, 0, .175, 1); }
+.tabs-row-active .tab { color: var(--u-ink); }
+.tabs.no-anim .tabs-row-active { transition: none; }
+.tab { height: 40px; padding: 0 16px; cursor: pointer; white-space: nowrap; background: none; border: 0;
+  border-right: 1px solid var(--u-line); color: var(--u-muted); font: 400 12px/1 var(--font-mono);
+  transition: transform 160ms cubic-bezier(.23, 1, .32, 1), color 200ms ease; }
+.tab:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--u-ink); } }
+
+.cfg-code { position: relative; flex: 1 1 auto; min-height: 120px; }
+.cfg-code pre { position: absolute; inset: 0; margin: 0; padding: 16px 96px 16px 16px; overflow: auto;
+  font: 400 12.5px/1.7 var(--font-mono); color: var(--u-ink); white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 2; }
+.cfg-copy { position: absolute; top: 12px; right: 12px; height: 30px; padding: 0 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--u-border); background: var(--u-bg); color: var(--u-muted); font: 400 12px/1 var(--font-mono);
+  transition: transform 160ms cubic-bezier(.23, 1, .32, 1), color 200ms ease, border-color 200ms ease; }
+.cfg-copy:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .cfg-copy:hover { color: var(--u-ink); border-color: var(--u-accent); } }
+.copy-label { display: inline-block; transition: filter 200ms ease, opacity 200ms ease; }
+.cfg-copy.swapping .copy-label { filter: blur(2px); opacity: .5; }
+.cfg-copy.done { color: var(--u-accent); border-color: var(--u-accent); }
+.cfg-hint { flex: none; margin: 0; padding: 10px 16px; border-top: 1px solid var(--u-line); font-size: 12px; color: var(--u-muted); }
+
+/* the tablet keeps the two panes side by side on one screen, the settings narrower; below 768px they stack,
+   the preview first, every control kept (it is the product, not a picture of it) */
+@media (min-width: 768px) and (max-width: 1279px) { .app.ui { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); } }
+@media (min-width: 768px) and (max-width: 1023px) { .cfg-sliders { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 640px) and (max-width: 767px) { #make { --h: 2; } }
+@media (max-width: 767px) {
+  /* a live tool keeps every control: stacked, the frame takes its natural height instead of filling what is left */
+  #make > .wrap > .app.fill { flex: none; }
+  .app.ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; }
+  .app > .app__pane + .app__pane { border-left: 0; }
+  .app > .app__pane--open { order: -1; border-bottom: 1px solid var(--u-line); }
+  .cfg-code { min-height: 140px; }
+  .cfg-sliders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cfg-input { max-width: none; }
+  .cfg-stage { min-height: 96px; padding: 12px 12px 56px; }
+  /* the status line takes its own row under the title rather than being cut */
+  .cfg-main > .cfg-bar { flex-wrap: wrap; height: auto; padding: 10px 16px; row-gap: 6px; }
+  .cfg-status { flex-basis: 100%; margin-left: 0; white-space: normal; line-height: 1.4; }
+  /* four tabs across 342px: the kit's smallest UI text (11px) and tighter padding, so none is cut */
+  .tab { padding: 0 7px; font-size: 11px; }
+}
+/* a phone: every control a 44px target (the kit's rule for links and buttons, carried to the app's own controls) */
+@media (max-width: 639px) {
+  .cfg-chip, .cfg-swatchpick, .cfg-hexpick, .cfg-accent input[type=color], .cfg-input, .tab, .cfg-copy { height: 44px; min-height: 44px; }
+  .cfg-chips, .cfg-accent { gap: 8px; }
+  .cfg-copy { top: 8px; right: 8px; }
+}
+
+/* ---------- the close: the name hand-set to run from line to line (close-word); "Timeline" is about 3.6em wide ---------- */
+/* the kit's .86 line keeps the word tight to the links; the tops of T and l then rise past the box, so the box
+   clips only sideways and lets them show */
+.close__word { font-size: calc(min(100vw - 2 * var(--gut), 1280px) / 3.74); line-height: .9; overflow-x: clip; overflow-y: visible; }
+.closing__links { gap: var(--s-5); }
+.footer__legal .socials:empty { display: none; }
+@media (max-width: 639px) {
+  /* a phone: the big word already names it, so the links drop the small logo and its line and the close stays one screen */
+  .closing__links > .grid > .span-4 { display: none; }
+  footer.closing > .wrap { row-gap: var(--s-5); }
+}
+@media (max-width: 639px) { .close__word { font-size: calc((100vw - 2 * var(--gut)) / 3.74); } }
+
+/* ---------- the questions: the grey line under the heading ---------- */
+.faq__intro { color: var(--muted); }
+/* the self-hosting answer, drawn: the workflow step that runs Timeline on a schedule */
+.faq__card { margin: var(--s-4) 0 0; }
+.faq__win { border-radius: var(--r-md); }
+.faq__yml { margin: 0; padding: 14px 16px; font: 400 12px/1.75 var(--font-mono); color: #c9d2d9; white-space: pre; overflow: hidden; }
+.faq__yml .y-k { color: #9aa4ad; } .faq__yml .y-s { color: #ffb38a; }
+
+/* ---------- the steps: a small running number over each step's title ---------- */
+/* at rest (below 1024px the scene does not pin) the section is one screen on a tablet and two on a phone, exactly
+   (layout-v4.md): the tablet's pictures are a little shorter, the phone's a little taller, to fill it */
+@media (min-width: 640px) and (max-width: 1023px) {
+  #how[data-moment]:not(.is-live) .mo-pc__visual > img { max-height: 18svh; }
+}
+@media (max-width: 639px) {
+  main > #how[data-moment]:not(.is-live) { min-height: calc(2 * 100vh); min-height: calc(2 * 100lvh); }
+  #how[data-moment]:not(.is-live) > .wrap { display: flex; flex-direction: column; justify-content: center; }
+  #how[data-moment]:not(.is-live) .mo-pc__visual > img { aspect-ratio: 4 / 3; max-height: none; }
+}
+.step-n { display: block; margin-bottom: 6px; font: 400 12px/1 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cfg-stage img { transition: opacity 200ms ease; }
+  .cfg-stage.busy img { filter: none; }
+  .copy-label { transition: opacity 200ms ease; }
+  .cfg-copy.swapping .copy-label { filter: none; }
+  .tabs-row-active { transition: none; }
+  .cfg-chip:active, .tab:active, .cfg-copy:active { transform: none; }
+}
+
+/* a short desktop or a tablet: the questions' rows sit a step closer, as the phone's do, so four fit one screen */
+@media (min-width: 640px) and (max-width: 1279px) { .faq > .faq__item { padding: var(--s-4) 0; } }

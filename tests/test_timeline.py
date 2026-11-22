@@ -193,6 +193,12 @@ class TestRender(unittest.TestCase):
         self.assertNotIn("gleam", without)
         self.assertIn("stroke=", timeline.generate({"width": "400", "border": "1"})[0])
 
+    def test_still_holds_the_frame(self):
+        still, _ = timeline.generate({"width": "400", "still": "1"})
+        moving, _ = timeline.generate({"width": "400"})
+        self.assertIn("animation:none!important", still)
+        self.assertNotIn("animation:none!important", moving)
+
 
 class TestWeekGrouping(unittest.TestCase):
     def test_full_year(self):

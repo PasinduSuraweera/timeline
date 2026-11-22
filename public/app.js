@@ -89,11 +89,34 @@
     previewTimer = setTimeout(drawPreview, 260);
   }
 
+  // The pause buttons and a reduced-motion setting both ask the renderer for its still frame. Only the
+  // preview gets it: the snippet keeps the moving wave.
+  var calm = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var paused = false;
+  function stillWanted() { return paused || calm.matches; }
+  function withStill(url) { return stillWanted() ? url + (url.indexOf("?") < 0 ? "?" : "&") + "still=1" : url; }
+
+  function setPaused(next) {
+    paused = next;
+    var buttons = document.querySelectorAll(".js-pause");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", paused ? "true" : "false");
+      buttons[i].setAttribute("aria-label", paused ? "Play the wave" : "Pause the wave");
+    }
+    var hero = document.querySelector(".tl-wave img");
+    if (hero) {
+      var base = hero.getAttribute("data-src") || hero.getAttribute("src").replace(/&still=1$/, "");
+      hero.setAttribute("data-src", base);
+      hero.src = paused ? base + "&still=1" : base;
+    }
+    drawPreview();
+  }
+
   function drawPreview() {
-    var url = imageUrl();
+    var url = withStill(imageUrl());
     var probe = new Image();
     probe.onload = probe.onerror = function () {
-      $("preview").src = url;
+      $("previewImg").src = url;
       $("frameWrap").classList.remove("busy");
     };
     probe.src = url;
@@ -106,7 +129,7 @@
   function setStatus(text, kind) {
     var el = $("status");
     el.textContent = text;
-    el.className = "status" + (kind ? " " + kind : "");
+    el.className = "cfg-status" + (kind ? " " + kind : "");
   }
 
   function scheduleMeta() {
@@ -233,13 +256,12 @@
     THEMES.forEach(function (t) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "swatch";
+      b.className = "cfg-chip cfg-swatch";
       b.setAttribute("role", "radio");
       b.dataset.value = t[0];
       var dot = document.createElement("i");
       dot.style.background = t[2];
       dot.style.boxShadow = "inset 0 0 0 3px " + t[1];
-      dot.style.outline = "1px solid var(--line-strong)";
       b.appendChild(dot);
       b.appendChild(document.createTextNode(t[0]));
       b.onclick = function () { state.theme = t[0]; sync(); };
@@ -252,7 +274,7 @@
     RIDERS.forEach(function (name) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "seg";
+      b.className = "cfg-chip";
       b.setAttribute("role", "radio");
       b.dataset.value = name;
       b.textContent = name;
@@ -265,15 +287,16 @@
     var wrap = $("sliders");
     SLIDERS.forEach(function (s) {
       var box = document.createElement("div");
-      box.className = "slider";
+      box.className = "cfg-slider";
 
       var head = document.createElement("div");
-      head.className = "head";
-      var label = document.createElement("span");
-      label.className = "lab";
+      head.className = "cfg-slider__head";
+      var label = document.createElement("label");
+      label.className = "cfg-label";
+      label.htmlFor = "in-" + s.key;
       label.textContent = s.label;
       var value = document.createElement("span");
-      value.className = "val";
+      value.className = "cfg-slider__val";
       value.id = "val-" + s.key;
       head.appendChild(label);
       head.appendChild(value);
@@ -283,7 +306,6 @@
       input.type = "range";
       input.min = s.min; input.max = s.max; input.step = s.step;
       input.id = "in-" + s.key;
-      input.setAttribute("aria-label", s.label);
       input.oninput = function () {
         state[s.key] = s.step < 1 ? parseFloat(input.value) : parseInt(input.value, 10);
         sync();
@@ -298,7 +320,7 @@
     TOGGLES.forEach(function (t) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "seg";
+      b.className = "cfg-chip";
       b.dataset.value = t.key;
       b.textContent = t.label;
       b.onclick = function () { state[t.key] = !state[t.key]; sync(); };
@@ -331,7 +353,9 @@
     var live = $("tabs");
     var btn = live.children[activeTab];
     if (!btn) { return; }
-    var rowWidth = live.offsetWidth || 0;
+    // Measured against the clipped row itself: the live tablist may be narrower than the bar (the kit sizes a
+    // tablist to its tabs), and a right inset taken from the narrower row lets the highlight run into the next tab.
+    var rowWidth = $("tabsActive").offsetWidth || live.offsetWidth || 0;
     var left = btn.offsetLeft || 0;
     var right = Math.max(0, rowWidth - left - (btn.offsetWidth || 0));
     $("tabsActive").style.clipPath = "inset(0 " + right + "px 0 " + left + "px)";
@@ -440,6 +464,8 @@
     };
     $("accentClear").onclick = function () { state.accent = ""; sync(); };
     $("copy").onclick = copy;
+    var pauses = document.querySelectorAll(".js-pause");
+    for (var i = 0; i < pauses.length; i++) { pauses[i].onclick = function () { setPaused(!paused); }; }
 
     readHash();
     $("user").value = state.user;
@@ -454,6 +480,10 @@
       requestAnimationFrame(function () { tabs.classList.remove("no-anim"); });
     }
     window.addEventListener("resize", moveTabHighlight);
+    // The tabs are measured in the web font; measure again once it has loaded, and whenever the row changes width
+    // (the app stacks below 1024px), or the highlight sits a few pixels off its tab.
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(moveTabHighlight); }
+    if (window.ResizeObserver) { new ResizeObserver(moveTabHighlight).observe($("tabs")); }
   }
 
   document.addEventListener("DOMContentLoaded", init);

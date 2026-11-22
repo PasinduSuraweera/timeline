@@ -4,7 +4,8 @@
     python3 devserver.py          then open http://localhost:8000
 
 Set GITHUB_TOKEN first for exact daily counts; without it the public fragment
-is used instead.
+is used instead. With --offline every username gets a made-up but steady year,
+for working on the site where GitHub cannot be reached.
 """
 
 import argparse
@@ -16,6 +17,16 @@ from urllib.parse import urlparse
 
 ROOT = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
+
+
+def _offline_year(login, token=None, weeks=52):
+    """A repeatable stand-in calendar, seeded by the username."""
+    import math
+    import random
+    rng = random.Random(login.lower())
+    base = [max(0, round(18 + 14 * math.sin(i / 6.0) + 9 * math.sin(i / 2.3) + rng.uniform(-6, 6)))
+            for i in range(53)]
+    return base[-weeks:], "offline"
 
 
 def _load(name, path):
@@ -55,6 +66,10 @@ class Router(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--offline", action="store_true", help="draw a stand-in year for every username")
     args = ap.parse_args()
+    if args.offline:
+        import timeline.source
+        timeline.source.weekly_totals = _offline_year
     print(f"timeline dev server on http://localhost:{args.port}")
     ThreadingHTTPServer(("127.0.0.1", args.port), Router).serve_forever()

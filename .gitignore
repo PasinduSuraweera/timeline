@@ -3,3 +3,8 @@ __pycache__/
 .vercel/
 .DS_Store
 node_modules/
+
+# local working files
+.old-site/
+public/.taste-skill/
+public/shots/

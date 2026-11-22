@@ -15,7 +15,7 @@ USER_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$")
 DEFAULTS = {
     "width": 880, "height": 140, "cell": 4, "speed": 33.0,
     "rider": "surfer", "rider_at": 33, "smooth": 1.0, "weeks": 52,
-    "glints": True, "dots": True, "border": False, "fallback": "sine",
+    "glints": True, "dots": True, "border": False, "still": False, "fallback": "sine",
 }
 
 LIMITS = {
@@ -100,6 +100,7 @@ class Options:
         self.glints = _flag(p.get("glints"), DEFAULTS["glints"])
         self.dots = _flag(p.get("dots"), DEFAULTS["dots"])
         self.border = _flag(p.get("border"), DEFAULTS["border"])
+        self.still = _flag(p.get("still"), DEFAULTS["still"])
 
         fallback = (p.get("fallback") or DEFAULTS["fallback"]).strip().lower()
         self.fallback = fallback if fallback in ("sine", "flat", "none") else "sine"

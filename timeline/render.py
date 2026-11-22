@@ -97,6 +97,9 @@ def build(wave_values, opts, colours, title=None):
         css.append(rider_css)
     # Anyone who asks their system to calm animation gets a still frame instead.
     css.append("@media(prefers-reduced-motion:reduce){.tape,.gl,.rd{animation:none}}")
+    # A page can ask for the still frame outright, for a pause button or a print.
+    if opts.still:
+        css.append(".tape,.gl,.rd{animation:none!important}")
 
     body = [
         f'<rect width="{width}" height="{height}" fill="{colours["bg"]}"/>',
