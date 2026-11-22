@@ -24,7 +24,7 @@
   [site-badge]: https://badgen.net/badge/site/timeline-readme.vercel.app/ff6a3d?labelColor=374151
   [site-url]: https://timeline-readme.vercel.app/
   [market-badge]: https://badgen.net/badge/marketplace/Timeline/ff6a3d?icon=github&labelColor=374151
-  [market-url]: https://github.com/marketplace/actions/timeline
+  [market-url]: https://github.com/marketplace/actions/timeline-contribution-wave
   [release-badge]: https://badgen.net/github/release/PasinduSuraweera/timeline-action?label=action&labelColor=374151&color=ff6a3d
   [release-url]: https://github.com/PasinduSuraweera/timeline-action/releases
   [python-badge]: https://badgen.net/badge/python/3.10%2B%20stdlib/ff6a3d?labelColor=374151
@@ -54,7 +54,7 @@ There is a shorter form for the plain case:
 ![my contribution wave](https://timeline-readme.vercel.app/YOUR_USERNAME.svg)
 ```
 
-To commit the SVG to your own repo on a schedule instead, use the [Timeline Action](https://github.com/marketplace/actions/timeline).
+To commit the SVG to your own repo on a schedule instead, use the [Timeline Action](https://github.com/marketplace/actions/timeline-contribution-wave).
 
 ## Themes
 
