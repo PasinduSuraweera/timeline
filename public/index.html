@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Timeline</title>
+<meta name="description" content="Turn a GitHub contribution calendar into an animated wave for your profile README.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2302070A'/><path d='M0 10h2v1H0zM2 9h2v1H2zM4 7h2v1H4zM6 6h2v1H6zM8 7h2v1H8zM10 9h2v1h-2zM12 10h2v1h-2zM14 10h2v1h-2z' fill='%23FF6A3D'/></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="mark" href="./">time<span>line</span></a>
+  <nav>
+    <a href="https://github.com/PasinduSuraweera/timeline">Source</a>
+    <a href="https://github.com/PasinduSuraweera/timeline#settings">Docs</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="intro rise" style="--rise-delay:0ms">
+    <h1>Your contribution year, as a wave you can ride.</h1>
+    <p>Timeline turns every week of your calendar into one swell. Put your username in,
+       pick a look, and paste the line into your profile README. It redraws itself as you commit.</p>
+  </section>
+
+  <section class="stage rise" style="--rise-delay:60ms">
+    <div class="frame" id="frameWrap">
+      <img id="preview" alt="Live preview of the contribution wave">
+    </div>
+    <p class="status" id="status" role="status">Loading the sample swell.</p>
+  </section>
+
+  <section class="panel rise" style="--rise-delay:110ms">
+
+    <div class="row row-user">
+      <label class="lab" for="user">GitHub username</label>
+      <input id="user" type="text" spellcheck="false" autocapitalize="off" autocorrect="off"
+             autocomplete="off" placeholder="octocat">
+    </div>
+
+    <div class="row">
+      <span class="lab">Theme</span>
+      <div class="swatches" id="themes" role="radiogroup" aria-label="Theme"></div>
+    </div>
+
+    <div class="row">
+      <label class="lab" for="accent">Custom accent</label>
+      <div class="accent-row">
+        <input id="accent" type="color" value="#ff6a3d" aria-label="Accent colour">
+        <input id="accentHex" type="text" spellcheck="false" placeholder="auto" maxlength="7">
+        <button class="ghost" id="accentClear" type="button">Use theme colour</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <span class="lab">Rider</span>
+      <div class="segmented" id="riders" role="radiogroup" aria-label="Rider"></div>
+    </div>
+
+    <div class="grid" id="sliders"></div>
+
+    <div class="row">
+      <span class="lab">Details</span>
+      <div class="segmented" id="toggles"></div>
+    </div>
+
+  </section>
+
+  <section class="output rise" style="--rise-delay:150ms">
+    <div class="tabs" id="tabsWrap">
+      <div class="tabs-row" id="tabs" role="tablist"></div>
+      <div class="tabs-row tabs-row-active" id="tabsActive" aria-hidden="true"></div>
+    </div>
+    <div class="code">
+      <pre id="snippet" tabindex="0"></pre>
+      <button class="copy" id="copy" type="button"><span class="copy-label" id="copyLabel">Copy</span></button>
+    </div>
+    <p class="hint" id="hint"></p>
+  </section>
+
+  <section class="notes">
+    <h2>Worth knowing</h2>
+    <dl>
+      <div>
+        <dt>It updates on its own</dt>
+        <dd>The image is generated per request, so the wave follows your calendar.
+          GitHub caches README images for a while, which is why a fresh commit takes
+          a little time to show up in the water.</dd>
+      </div>
+      <div>
+        <dt>Counts and levels</dt>
+        <dd>With a token the renderer reads exact daily counts. Without one it falls back
+          to the public calendar, which sometimes exposes only the five shading levels.
+          The wave keeps its shape either way.</dd>
+      </div>
+      <div>
+        <dt>Motion</dt>
+        <dd>Anyone browsing with reduced motion turned on gets a still frame, not a scroll.</dd>
+      </div>
+      <div>
+        <dt>Run it yourself</dt>
+        <dd>The whole renderer is standard-library Python with no dependencies. Deploy your
+          own copy, or use the Action tab to commit the SVG into your repo on a schedule
+          and skip the hosting entirely.</dd>
+      </div>
+    </dl>
+  </section>
+
+</main>
+
+<footer>
+  <span>Built from the header on <a href="https://github.com/PasinduSuraweera">PasinduSuraweera</a>'s profile.</span>
+  <span>MIT licensed.</span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

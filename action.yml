@@ -1,0 +1,97 @@
+name: "Timeline"
+description: "Render a GitHub contribution calendar as an animated wave SVG"
+author: "PasinduSuraweera"
+branding:
+  icon: "activity"
+  color: "orange"
+
+inputs:
+  user:
+    description: "GitHub username whose calendar is read"
+    required: true
+  out:
+    description: "Path for the generated SVG"
+    default: "assets/timeline.svg"
+  token:
+    description: "Token used to read exact daily counts"
+    default: ${{ github.token }}
+  strict:
+    description: "Fail rather than drawing the stand-in swell"
+    default: "false"
+  theme:
+    description: "ember, ice, matrix, grape, rose, gold, mono, daylight or paper"
+    default: ""
+  accent:
+    description: "Hex colour overriding the theme accent"
+    default: ""
+  bg:
+    description: "Hex background colour"
+    default: ""
+  hot:
+    description: "Hex colour for the cap on the ridge"
+    default: ""
+  glint:
+    description: "Hex colour for the travelling sparkle"
+    default: ""
+  width:
+    description: "Band width in pixels, 320 to 1600"
+    default: ""
+  height:
+    description: "Band height in pixels, 60 to 400"
+    default: ""
+  cell:
+    description: "Size of one dot in pixels, 2 to 10"
+    default: ""
+  speed:
+    description: "Seconds for one full scroll, 4 to 300"
+    default: ""
+  smooth:
+    description: "Swell smoothing, 0.2 to 5"
+    default: ""
+  weeks:
+    description: "Weeks of history to draw, 8 to 53"
+    default: ""
+  rider:
+    description: "surfer, sail, buoy, flag or none"
+    default: ""
+  rider_at:
+    description: "Where the rider sits, 0 to 100 percent"
+    default: ""
+  glints:
+    description: "Sparkle along the crest"
+    default: ""
+  dots:
+    description: "The dim dot grid behind the water"
+    default: ""
+  border:
+    description: "Hairline border around the band"
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Render the contribution wave
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: |
+        python3 "${{ github.action_path }}/cli.py" \
+          --user   "${{ inputs.user }}" \
+          --out    "${{ inputs.out }}" \
+          --theme  "${{ inputs.theme }}" \
+          --accent "${{ inputs.accent }}" \
+          --bg     "${{ inputs.bg }}" \
+          --hot    "${{ inputs.hot }}" \
+          --glint  "${{ inputs.glint }}" \
+          --width  "${{ inputs.width }}" \
+          --height "${{ inputs.height }}" \
+          --cell   "${{ inputs.cell }}" \
+          --speed  "${{ inputs.speed }}" \
+          --smooth "${{ inputs.smooth }}" \
+          --weeks  "${{ inputs.weeks }}" \
+          --rider  "${{ inputs.rider }}" \
+          --rider_at "${{ inputs.rider_at }}" \
+          --glints "${{ inputs.glints }}" \
+          --dots   "${{ inputs.dots }}" \
+          --border "${{ inputs.border }}" \
+          ${{ inputs.strict == 'true' && '--strict' || '' }}

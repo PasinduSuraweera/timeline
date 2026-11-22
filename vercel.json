@@ -1,0 +1,36 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "public",
+  "functions": {
+    "api/*.py": {
+      "includeFiles": "timeline/**",
+      "maxDuration": 15
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/timeline.svg",
+      "destination": "/api/timeline"
+    },
+    {
+      "source": "/meta",
+      "destination": "/api/meta"
+    },
+    {
+      "source": "/:user([A-Za-z0-9-]{1,39}).svg",
+      "destination": "/api/timeline?user=:user"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(style.css|app.js)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    }
+  ]
+}
