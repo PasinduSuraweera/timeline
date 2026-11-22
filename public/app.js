@@ -218,7 +218,7 @@
       + "    runs-on: ubuntu-latest\n"
       + "    steps:\n"
       + "      - uses: actions/checkout@v4\n"
-      + "      - uses: PasinduSuraweera/timeline@v1\n"
+      + "      - uses: PasinduSuraweera/timeline-action@v1\n"
       + "        with:\n"
       + withs.map(function (p) { return "          " + p[0] + ": " + p[1]; }).join("\n") + "\n"
       + "        env:\n"

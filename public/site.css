@@ -199,7 +199,7 @@
 /* the self-hosting answer, drawn: the workflow step that runs Timeline on a schedule */
 .faq__card { margin: var(--s-4) 0 0; }
 .faq__win { border-radius: var(--r-md); }
-.faq__yml { margin: 0; padding: 14px 16px; font: 400 12px/1.75 var(--font-mono); color: #c9d2d9; white-space: pre; overflow: hidden; }
+.faq__yml { margin: 0; padding: 14px 16px; font: 400 11px/1.75 var(--font-mono); color: #c9d2d9; white-space: pre; overflow-x: auto; }
 .faq__yml .y-k { color: #9aa4ad; } .faq__yml .y-s { color: #ffb38a; }
 
 /* ---------- the steps: a small running number over each step's title ---------- */

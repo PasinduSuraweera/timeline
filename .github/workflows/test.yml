@@ -6,11 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  python:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python: ["3.9", "3.12", "3.13"]
+        # the versions setup-python builds for the current Ubuntu runner (3.9 is no longer one of them)
+        python: ["3.10", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,3 +25,13 @@ jobs:
           for t in ember ice matrix grape rose gold mono daylight paper; do
             python cli.py --user octocat --theme "$t" --out "/tmp/$t.svg"
           done
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the page script
+        run: node tests/app.test.js
