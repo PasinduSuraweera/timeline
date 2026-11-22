@@ -107,6 +107,8 @@ main { max-width: 1000px; margin: 0 auto; padding: 0 24px 72px; }
   transition: filter var(--swap) ease, opacity var(--swap) ease;
 }
 .frame.busy img { filter: blur(3px); opacity: .55; }
+/* Before the first render lands there is no src, and the alt text would show through. */
+.frame img:not([src]) { visibility: hidden; }
 
 .status {
   margin: 10px 0 0; min-height: 18px;
