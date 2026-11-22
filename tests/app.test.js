@@ -62,6 +62,8 @@ function makeDom(hash) {
     document: {
       execCommand: () => true,
       getElementById: (i) => byId[i] || null,
+      querySelectorAll: () => [],
+      querySelector: () => null,
       createElement: el,
       createTextNode: (t) => ({ nodeType: 3, textContent: t }),
       addEventListener: (ev, cb) => { if (ev === "DOMContentLoaded") ready = cb; },
