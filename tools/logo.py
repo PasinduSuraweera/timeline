@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import sys
 
+from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 from fontTools.ttLib import TTFont
@@ -91,23 +92,28 @@ class Type:
         self.hb_font = hb.Font(hb.Face(hb.Blob(raw.getvalue())))
 
     def path(self, text, px, x, baseline, tracking=-0.02):
-        """Outline of text set at px, its baseline at y=baseline. Returns (d, width)."""
+        """Outline of text set at px, its baseline at y=baseline.
+
+        Returns (d, width, top): top is the highest point of the ink."""
         buf = hb.Buffer()
         buf.add_str(text)
         buf.guess_segment_properties()
         hb.shape(self.hb_font, buf, {"kern": True, "liga": True})
         scale = px / self.upem
         pen = SVGPathPen(self.glyphs)
+        bounds = BoundsPen(self.glyphs)
         pen_x = 0.0
         last = len(buf.glyph_infos) - 1
         for n, (info, pos) in enumerate(zip(buf.glyph_infos, buf.glyph_positions)):
             name = self.order[info.codepoint]
             t = TransformPen(pen, (scale, 0, 0, -scale, x + (pen_x + pos.x_offset) * scale, baseline))
             self.glyphs[name].draw(t)
+            self.glyphs[name].draw(TransformPen(bounds, (scale, 0, 0, -scale, x + (pen_x + pos.x_offset) * scale, baseline)))
             pen_x += pos.x_advance
             if n < last:
                 pen_x += tracking * self.upem
-        return pen.getCommands(), pen_x * scale
+        top = bounds.bounds[1] if bounds.bounds else baseline
+        return pen.getCommands(), pen_x * scale, top
 
 
 def lockup(type_, px, colour, x=0.0, y=0.0):
@@ -120,9 +126,23 @@ def lockup(type_, px, colour, x=0.0, y=0.0):
     # The squares are centred in the mark's box, so centring the capitals on the
     # box lines the wave up with the letters.
     baseline = y + msize / 2 + cap / 2
-    d, tw = type_.path("Timeline", px, x + msize + gap, baseline)
+    d, tw, _ = type_.path("Timeline", px, x + msize + gap, baseline)
     body = rects(mark_cells(msize, x, y), EMBER) + f'<path d="{d}" fill="{colour}"/>'
     return body, msize + gap + tw, msize
+
+
+def lockup_file(type_, px, colour):
+    """The lockup cropped to its ink, so it sits tight in a README or a slide."""
+    body, w, h = lockup(type_, px, colour)
+    cells = mark_cells(h)
+    cap = type_.cap / type_.upem * px
+    _, _, text_top = type_.path("Timeline", px, 0, h / 2 + cap / 2)
+    top = min(text_top, cells[0][1], min(c[1] for c in cells))
+    bottom = max(h / 2 + cap / 2, max(c[1] + c[2] for c in cells))
+    left = cells[0][0]
+    pad = px * 0.06
+    inner = f'<g transform="translate({num(pad - left)} {num(pad - top)})">{body}</g>'
+    return svg(w - left + 2 * pad, bottom - top + 2 * pad, inner)
 
 
 # ---------- the share card ----------
@@ -133,7 +153,7 @@ def share_card(type_):
     body = f'<rect width="{w}" height="{h}" fill="{NIGHT}"/>'
     lk, lw, lh = lockup(type_, 88, INK, pad, 128)
     body += lk
-    d, _ = type_.path("Your last 52 weeks as a scrolling pixel wave.", 34, pad, 128 + lh + 78, tracking=-0.01)
+    d, _, _ = type_.path("Your last 52 weeks as a scrolling pixel wave.", 34, pad, 128 + lh + 78, tracking=-0.01)
     body += f'<path d="{d}" fill="{MUTED}"/>'
     # A year of weeks, one square each, riding its own smoothed swell.
     days = sample_days()
@@ -176,8 +196,7 @@ def main():
     write(os.path.join(LOGO, "mark.svg"), svg(24, 24, rects(mark_cells(), EMBER)))
 
     for name, colour in (("lockup-dark.svg", INK), ("lockup-light.svg", NIGHT)):
-        body, w, h = lockup(type_, 64, colour)
-        write(os.path.join(LOGO, name), svg(w, h, body))
+        write(os.path.join(LOGO, name), lockup_file(type_, 64, colour))
 
     # A square icon for avatars and app tiles: the mark on the night ground.
     icon = f'<rect width="512" height="512" rx="112" fill="{NIGHT}"/>' + rects(mark_cells(352, 80, 80), EMBER)
