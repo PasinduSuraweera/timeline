@@ -11,7 +11,6 @@ import urllib.parse
 import urllib.request
 
 REPO = "PasinduSuraweera/timeline"
-OWNER = "PasinduSuraweera"
 # What a file has to contain to count as using Timeline: the hosted image, or the Action.
 SEARCHES = ('"timeline-readme.vercel.app"', '"PasinduSuraweera/timeline-action"')
 # Our own repos and copies of them mention both strings without using the wave.
@@ -39,15 +38,15 @@ def stars(token=""):
 def users_from_items(items):
     """Distinct people behind a list of code search hits, in the order first seen.
 
-    Leaves out the owner, forks, and repos named like ours, since those mention
-    Timeline without wearing the wave.
+    Leaves out forks and Timeline's own repos, since those mention Timeline
+    without wearing the wave. The owner counts like anyone else.
     """
     seen, out = set(), []
     for item in items:
         repo = item.get("repository") or {}
         owner = repo.get("owner") or {}
         login = owner.get("login") or ""
-        if (not login or login.lower() == OWNER.lower() or repo.get("fork")
+        if (not login or repo.get("fork")
                 or (repo.get("name") or "").lower() in OWN_REPOS):
             continue
         if login.lower() in seen:

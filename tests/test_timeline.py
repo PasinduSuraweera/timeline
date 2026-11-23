@@ -226,7 +226,7 @@ class TestUsage(unittest.TestCase):
         items = [self.hit("YOOSUF-HUB", "YOOSUF-HUB"), self.hit("yoosuf-hub", "dotfiles"),
                  self.hit("PasinduSuraweera", "PasinduSuraweera"), self.hit("someone", "timeline"),
                  self.hit("forker", "profile", fork=True), self.hit("Dippy2003", "Dippy2003")]
-        self.assertEqual([u["login"] for u in usage.users_from_items(items)], ["YOOSUF-HUB", "Dippy2003"])
+        self.assertEqual([u["login"] for u in usage.users_from_items(items)], ["YOOSUF-HUB", "PasinduSuraweera", "Dippy2003"])
 
     def test_no_token_means_unknown_not_zero(self):
         self.assertIsNone(usage.users(""))
