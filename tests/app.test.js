@@ -16,6 +16,9 @@ function check(name, actual, expected) {
   }
 }
 
+let statsPayload = { ok: true, stars: 1234, count: 2,
+                     users: [{ login: "Dippy2003", avatar: "https://avatars.example/a" },
+                             { login: "YOOSUF-HUB", avatar: "" }] };
 let metaPayload = { ok: true, user: "x", weeks: 52, source: "api", exact: true,
                     usable: true, busiest_week: 40, total: 1234 };
 
@@ -53,7 +56,8 @@ function makeDom(hash) {
 
   const ids = ["previewImg", "preview", "status", "user", "themes", "accent", "accentHex",
                "accentClear", "riders", "sliders", "toggles", "tabs", "tabsWrap",
-               "tabsActive", "snippet", "copy", "copyLabel", "hint", "frameWrap"];
+               "tabsActive", "snippet", "copy", "copyLabel", "hint", "frameWrap",
+               "ghStars", "usedBy", "usedByFaces", "usedByCount"];
   ids.forEach(function (i) { const n = el("div"); n.id = i; });
 
   let ready = null;
@@ -72,8 +76,11 @@ function makeDom(hash) {
     location: { origin: "https://timeline.example", hash: hash || "" },
     history: { replaceState(_a, _b, url) { ctx.location.hash = url; } },
     navigator: {},
-    fetch: () => Promise.resolve({ ok: metaPayload.ok !== false,
-                                   json: () => Promise.resolve(metaPayload) }),
+    fetch: (url) => {
+      const stats = String(url).indexOf("/api/stats") === 0;
+      return Promise.resolve({ ok: stats || metaPayload.ok !== false,
+                               json: () => Promise.resolve(stats ? statsPayload : metaPayload) });
+    },
     Image: function () { this.src = ""; },
     requestAnimationFrame: (fn) => fn(),
     addEventListener() {},
@@ -105,6 +112,8 @@ check("the tab copy is out of the tab order", byId.tabsActive.children[0].tabInd
 check("no user means an empty query", ctx.location.hash, "#");
 check("placeholder username in the snippet", byId.snippet.textContent,
       (s) => s.includes("your-username") && s.startsWith("[!["));
+check("the snippet's image names a user even before one is typed", byId.snippet.textContent,
+      (s) => s.includes("/api/timeline?user=your-username"));
 check("status invites a username", byId.status.textContent,
       (s) => s.toLowerCase().includes("sample"));
 
@@ -212,6 +221,17 @@ check("restored slider shows its value", restored.byId["val-width"].textContent,
   await sleep(700);
   check("plural counts read correctly", many.byId.status.textContent,
         (s) => s.startsWith("52 weeks, 1234 contributions,") && s.includes("Exact"));
+
+  /* ---------- stars and people using it ---------- */
+  const fresh = makeDom("");
+  fresh.byId.usedBy.hidden = true;
+  await sleep(50);
+  check("star count is shortened", fresh.byId.ghStars.textContent, "1.2k");
+  check("used-by row appears", fresh.byId.usedBy.hidden, false);
+  check("one face per person", fresh.byId.usedByFaces.children.length, 2);
+  check("used-by count reads in words", fresh.byId.usedByCount.textContent, "On 2 GitHub profiles");
+  check("a missing avatar falls back to the profile picture",
+        fresh.byId.usedByFaces.children[1].children[0].src, "https://github.com/YOOSUF-HUB.png?s=56");
 
   console.log(failures ? `\n${failures} failing` : "\nall app.js checks passed");
   process.exit(failures ? 1 : 0);
