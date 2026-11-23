@@ -7,6 +7,7 @@ import re
 import struct
 import sys
 import unittest
+from unittest import mock
 import zlib
 from datetime import date, timedelta
 
@@ -227,6 +228,13 @@ class TestUsage(unittest.TestCase):
                  self.hit("PasinduSuraweera", "PasinduSuraweera"), self.hit("someone", "timeline"),
                  self.hit("forker", "profile", fork=True), self.hit("Dippy2003", "Dippy2003")]
         self.assertEqual([u["login"] for u in usage.users_from_items(items)], ["YOOSUF-HUB", "PasinduSuraweera", "Dippy2003"])
+
+    def test_known_profiles_join_only_while_they_wear_the_wave(self):
+        readmes = {"PasinduSuraweera": "<img src=https://timeline-readme.vercel.app/api/timeline>",
+                   "Dippy2003": "no wave here"}
+        with mock.patch.object(usage, "_get", return_value={"items": [self.hit("YOOSUF-HUB", "YOOSUF-HUB")]}), \
+             mock.patch.object(usage, "_get_text", side_effect=lambda url, tok: readmes[url.split("/")[4]]):
+            self.assertEqual([u["login"] for u in usage.users("t")], ["YOOSUF-HUB", "PasinduSuraweera"])
 
     def test_no_token_means_unknown_not_zero(self):
         self.assertIsNone(usage.users(""))
