@@ -1,5 +1,6 @@
 """Tests for Timeline. Standard library only, like the renderer itself."""
 
+import io
 import math
 import pathlib
 import random
@@ -7,13 +8,14 @@ import re
 import struct
 import sys
 import unittest
+from unittest import mock
 import zlib
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import timeline
-from timeline import band, render, sprites, themes, usage, wave
+from timeline import band, render, seen, sprites, themes, usage, wave
 from timeline.options import Options
 from timeline.source import _group_into_weeks
 
@@ -230,6 +232,56 @@ class TestUsage(unittest.TestCase):
 
     def test_no_token_means_unknown_not_zero(self):
         self.assertIsNone(usage.users(""))
+
+
+class TestSeen(unittest.TestCase):
+    NOW = 1_800_000_000
+
+    def blob(self, login, days_ago):
+        stamp = datetime.fromtimestamp(self.NOW - days_ago * 86400, timezone.utc).isoformat()
+        return {"pathname": f"users/{login}", "uploadedAt": stamp.replace("+00:00", "Z")}
+
+    def test_only_githubs_image_proxy_counts(self):
+        self.assertTrue(seen.from_camo("github-camo (876de43e)"))
+        self.assertFalse(seen.from_camo("Mozilla/5.0 Chrome/131"))
+        self.assertFalse(seen.from_camo(None))
+
+    def test_newest_first_one_per_person_and_old_ones_drop(self):
+        blobs = [self.blob("YOOSUF-HUB", 3), self.blob("PasinduSuraweera", 0),
+                 self.blob("pasindusuraweera", 5), self.blob("gone", 45), self.blob("bad name", 0)]
+        self.assertEqual(seen.logins_from_blobs(blobs, now=self.NOW), ["PasinduSuraweera", "YOOSUF-HUB"])
+
+    def test_record_puts_one_private_blob_per_login(self):
+        sent = {}
+
+        class Resp(io.BytesIO):
+            def __enter__(self): return self
+            def __exit__(self, *a): pass
+
+        def fake(req, timeout):
+            sent.update(url=req.full_url, method=req.get_method(), headers=dict(req.header_items()), body=req.data)
+            return Resp(b"{}")
+
+        with mock.patch.object(seen.urllib.request, "urlopen", side_effect=fake):
+            self.assertTrue(seen.record("Dippy2003", tok="vercel_blob_rw_abc123_secret"))
+        self.assertEqual(sent["method"], "PUT")
+        self.assertTrue(sent["url"].endswith("/?pathname=users%2FDippy2003"))
+        self.assertEqual(sent["headers"]["X-vercel-blob-store-id"], "abc123")
+        self.assertEqual(sent["headers"]["X-vercel-blob-access"], "private")
+        self.assertEqual(sent["headers"]["X-allow-overwrite"], "1")
+        self.assertEqual(sent["body"], b"Dippy2003")
+
+    def test_no_store_or_bad_login_saves_nothing(self):
+        self.assertFalse(seen.record("someone", tok=""))
+        self.assertFalse(seen.record("../etc", tok="vercel_blob_rw_a_b"))
+        self.assertIsNone(seen.recent(tok=""))
+
+    def test_merge_puts_seen_first_and_counts_each_person_once(self):
+        searched = [{"login": "YOOSUF-HUB", "avatar": "a"}, {"login": "someone", "avatar": "b"}]
+        merged = usage.merge(["yoosuf-hub", "Dippy2003"], searched)
+        self.assertEqual([u["login"] for u in merged], ["yoosuf-hub", "Dippy2003", "someone"])
+        self.assertIsNone(usage.merge(None, None))
+        self.assertEqual(usage.merge(None, searched), searched)
 
 
 if __name__ == "__main__":

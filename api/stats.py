@@ -1,7 +1,8 @@
 """GET /api/stats -> {"stars": n, "users": [{"login", "avatar"}] | null, "count": n | null}.
 
 The site reads this for the star count in the nav and the row of people using the
-wave. GitHub is asked at most about once an hour: the CDN keeps each answer.
+wave: everyone GitHub has loaded a wave for lately (timeline/seen.py), plus anyone
+code search finds. GitHub is asked at most about once an hour: the CDN keeps each answer.
 """
 
 import json
@@ -12,7 +13,7 @@ from http.server import BaseHTTPRequestHandler
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from timeline import usage   # noqa: E402
+from timeline import seen, usage   # noqa: E402
 
 TOKEN = os.environ.get("GITHUB_TOKEN") or os.environ.get("TIMELINE_GITHUB_TOKEN") or ""
 CACHE_SECONDS = 3600
@@ -20,7 +21,7 @@ CACHE_SECONDS = 3600
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        people = usage.users(TOKEN)
+        people = usage.merge(seen.recent(), usage.users(TOKEN))
         out = {"ok": True, "stars": usage.stars(TOKEN), "users": people,
                "count": None if people is None else len(people)}
 

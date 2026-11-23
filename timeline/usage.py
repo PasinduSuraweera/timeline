@@ -73,3 +73,22 @@ def users(token=""):
     except Exception:
         return None
     return users_from_items(items)
+
+
+def merge(seen_logins, searched):
+    """Everyone GitHub has loaded a wave for, then anyone code search adds.
+
+    Either source may be None when it can't be read; None only if both are.
+    """
+    if seen_logins is None and searched is None:
+        return None
+    out, have = [], set()
+    for login in seen_logins or []:
+        if login.lower() not in have:
+            have.add(login.lower())
+            out.append({"login": login, "avatar": f"https://avatars.githubusercontent.com/{login}"})
+    for person in searched or []:
+        if person["login"].lower() not in have:
+            have.add(person["login"].lower())
+            out.append(person)
+    return out
