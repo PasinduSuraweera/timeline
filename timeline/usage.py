@@ -15,10 +15,6 @@ REPO = "PasinduSuraweera/timeline"
 SEARCHES = ('"timeline-readme.vercel.app"', '"PasinduSuraweera/timeline-action"')
 # Our own repos and copies of them mention both strings without using the wave.
 OWN_REPOS = {"timeline", "timeline-action"}
-# Profiles code search has missed. Each is still checked: it counts only while
-# that profile README contains the wave or the Action.
-KNOWN = ("PasinduSuraweera", "Dippy2003")
-MARKERS = ("timeline-readme.vercel.app", "PasinduSuraweera/timeline-action")
 
 
 def _get(url, token, timeout=8):
@@ -29,25 +25,6 @@ def _get(url, token, timeout=8):
     req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.load(resp)
-
-
-def _get_text(url, token, timeout=8):
-    headers = {"Accept": "application/vnd.github.raw+json", "User-Agent": "timeline-stats",
-               "X-GitHub-Api-Version": "2022-11-28"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return resp.read().decode("utf-8", "replace")
-
-
-def wears_wave(login, token):
-    """True if login's profile README embeds the wave or runs the Action."""
-    try:
-        text = _get_text(f"https://api.github.com/repos/{login}/{login}/readme", token)
-    except Exception:
-        return False
-    return any(m in text for m in MARKERS)
 
 
 def stars(token=""):
@@ -95,9 +72,4 @@ def users(token=""):
                     break
     except Exception:
         return None
-    people = users_from_items(items)
-    seen = {u["login"].lower() for u in people}
-    for login in KNOWN:
-        if login.lower() not in seen and wears_wave(login, token):
-            people.append({"login": login, "avatar": f"https://avatars.githubusercontent.com/{login}"})
-    return people
+    return users_from_items(items)
