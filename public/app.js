@@ -58,6 +58,8 @@
     var parts = [];
     var push = function (k, v) { parts.push(k + "=" + encodeURIComponent(v)); };
     if (state.user && !opts.omitUser) push("user", state.user);
+    // A snippet always names a user: without one the README would show the sample swell, not your year.
+    else if (opts.placeholder && !opts.omitUser) push("user", "your-username");
     var theme = opts.theme || state.theme;
     if (theme !== DEFAULTS.theme) push("theme", theme);
     if (state.accent) push("accent", state.accent.replace("#", ""));
@@ -173,7 +175,7 @@
   function snippet() {
     var who = state.user || "your-username";
     var alt = who + "'s contribution wave";
-    var url = imageUrl();
+    var url = imageUrl({ placeholder: true });
     var profile = "https://github.com/" + who;
 
     if (activeTab === 0) {
@@ -185,7 +187,7 @@
         + "</a>";
     }
     if (activeTab === 2) {
-      var light = imageUrl({ theme: "paper" }).replace(/&/g, "&amp;");
+      var light = imageUrl({ theme: "paper", placeholder: true }).replace(/&/g, "&amp;");
       var dark = url.replace(/&/g, "&amp;");
       return "<picture>\n"
         + '  <source media="(prefers-color-scheme: light)" srcset="' + light + '">\n'
@@ -444,6 +446,49 @@
     }
   }
 
+  /* ---------- stars and people using it ---------- */
+
+  function compact(n) {
+    return n >= 1000 ? (Math.round(n / 100) / 10).toString().replace(/\.0$/, "") + "k" : String(n);
+  }
+
+  function showStats(data) {
+    if (!data || data.ok === false) { return; }
+    var stars = $("ghStars");
+    if (stars && typeof data.stars === "number") {
+      stars.textContent = compact(data.stars);
+      stars.parentNode && stars.parentNode.setAttribute("aria-label",
+        "Star Timeline on GitHub, " + data.stars + (data.stars === 1 ? " star" : " stars"));
+    }
+    var row = $("usedBy"), faces = $("usedByFaces"), label = $("usedByCount");
+    var people = data.users;
+    if (!row || !faces || !label || !people || !people.length) { return; }
+    var shown = people.slice(0, 8);
+    faces.innerHTML = "";
+    shown.forEach(function (p) {
+      var a = document.createElement("a");
+      a.href = "https://github.com/" + encodeURIComponent(p.login);
+      a.className = "used-by__face";
+      a.title = p.login;
+      var img = document.createElement("img");
+      img.src = (p.avatar || ("https://github.com/" + encodeURIComponent(p.login) + ".png"))
+        + ((p.avatar || "").indexOf("?") < 0 ? "?" : "&") + "s=56";
+      img.alt = p.login;
+      img.width = 28; img.height = 28;
+      img.loading = "lazy";
+      a.appendChild(img);
+      faces.appendChild(a);
+    });
+    label.textContent = "On " + people.length + (people.length === 1 ? " GitHub profile" : " GitHub profiles");
+    row.hidden = false;
+  }
+
+  function loadStats() {
+    if (typeof fetch !== "function") { return; }
+    fetch("/api/stats").then(function (r) { return r.ok ? r.json() : null; })
+      .then(showStats).catch(function () { /* the counts are a nicety: leave them out */ });
+  }
+
   /* ---------- go ---------- */
 
   function init() {
@@ -471,6 +516,7 @@
     $("user").value = state.user;
     sync();
     scheduleMeta();
+    loadStats();
 
     // The highlight should be in place on first paint, not slide in from the edge.
     var tabs = $("tabsWrap");

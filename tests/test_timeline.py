@@ -13,7 +13,7 @@ from datetime import date, timedelta
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import timeline
-from timeline import band, render, sprites, themes, wave
+from timeline import band, render, sprites, themes, usage, wave
 from timeline.options import Options
 from timeline.source import _group_into_weeks
 
@@ -215,6 +215,21 @@ class TestWeekGrouping(unittest.TestCase):
         start = date(2025, 11, 23)
         days = [((start + timedelta(days=i)).isoformat(), 2) for i in range(14)] * 2
         self.assertEqual(_group_into_weeks(days), [14, 14])
+
+
+class TestUsage(unittest.TestCase):
+    def hit(self, login, name="login", fork=False):
+        return {"repository": {"name": name, "fork": fork,
+                               "owner": {"login": login, "avatar_url": f"https://a/{login}"}}}
+
+    def test_counts_each_person_once_and_skips_our_own(self):
+        items = [self.hit("YOOSUF-HUB", "YOOSUF-HUB"), self.hit("yoosuf-hub", "dotfiles"),
+                 self.hit("PasinduSuraweera", "PasinduSuraweera"), self.hit("someone", "timeline"),
+                 self.hit("forker", "profile", fork=True), self.hit("Dippy2003", "Dippy2003")]
+        self.assertEqual([u["login"] for u in usage.users_from_items(items)], ["YOOSUF-HUB", "Dippy2003"])
+
+    def test_no_token_means_unknown_not_zero(self):
+        self.assertIsNone(usage.users(""))
 
 
 if __name__ == "__main__":

@@ -38,6 +38,7 @@ def _load(name, path):
 
 TIMELINE = _load("api_timeline", ROOT / "api" / "timeline.py")
 META = _load("api_meta", ROOT / "api" / "meta.py")
+STATS = _load("api_stats", ROOT / "api" / "stats.py")
 
 
 class Router(SimpleHTTPRequestHandler):
@@ -55,6 +56,8 @@ class Router(SimpleHTTPRequestHandler):
             return TIMELINE.handler.do_GET(self)
         if path == "/api/meta":
             return META.handler.do_GET(self)
+        if path == "/api/stats":
+            return STATS.handler.do_GET(self)
         # /<username>.svg is the short form of /api/timeline?user=<username>
         if path.endswith(".svg") and path.count("/") == 1:
             user = path[1:-4]
@@ -71,5 +74,10 @@ if __name__ == "__main__":
     if args.offline:
         import timeline.source
         timeline.source.weekly_totals = _offline_year
+        # A steady star count and two people, so the nav and the used-by row show without GitHub.
+        STATS.usage.stars = lambda token="": 2
+        STATS.usage.users = lambda token="": [
+            {"login": "Dippy2003", "avatar": "https://github.com/Dippy2003.png"},
+            {"login": "YOOSUF-HUB", "avatar": "https://github.com/YOOSUF-HUB.png"}]
     print(f"timeline dev server on http://localhost:{args.port}")
     ThreadingHTTPServer(("127.0.0.1", args.port), Router).serve_forever()

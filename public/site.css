@@ -230,3 +230,34 @@
 
 /* a short desktop or a tablet: the questions' rows sit a step closer, as the phone's do, so four fit one screen */
 @media (min-width: 640px) and (max-width: 1279px) { .faq > .faq__item { padding: var(--s-4) 0; } }
+
+/* ---------- GitHub star button in the nav: the mark, "Star", then the count after a hairline ---------- */
+.gh-star {
+  display: inline-flex; align-items: stretch; height: var(--btn-h); border: 1px solid var(--line-strong);
+  border-radius: var(--r-btn); color: var(--ink); font: 500 15px/1 var(--font-text); text-decoration: none;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.gh-star:hover { background: color-mix(in oklab, var(--bg) 94%, var(--ink)); border-color: color-mix(in oklab, var(--ink) 35%, transparent); }
+.gh-star:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.gh-star__logo { width: 16px; height: 16px; align-self: center; margin-left: var(--s-3); }
+.gh-star__label { display: inline-flex; align-items: center; padding: 0 var(--s-3) 0 var(--s-2); }
+.gh-star__count {
+  display: inline-flex; align-items: center; gap: 5px; padding: 0 var(--s-3); border-left: 1px solid var(--line-strong);
+  color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.gh-star__icon { width: 13px; height: 13px; color: var(--accent, #ff6a3d); }
+#ghStars { min-width: 1ch; }
+@media (max-width: 1023px) {
+  .nav.is-open .nav__actions .gh-star { order: 2; justify-content: center; height: 48px; font-size: var(--t-body); }
+  .nav.is-open .nav__actions .gh-star__label { flex: 1; justify-content: flex-start; }
+  .nav.is-open .nav__actions .gh-star__count { flex: 1; justify-content: center; }
+}
+
+/* ---------- the people already wearing the wave: overlapping avatars and a count ---------- */
+.used-by { display: flex; align-items: center; justify-content: center; gap: var(--s-3); margin-top: var(--s-5); color: var(--muted); font-size: var(--t-small); }
+.used-by[hidden] { display: none; }
+.used-by__faces { display: inline-flex; }
+.used-by__face { display: block; width: 28px; height: 28px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 2px var(--bg); background: var(--surface); }
+.used-by__face + .used-by__face { margin-left: -8px; }
+.used-by__face img { display: block; width: 100%; height: 100%; }
+.used-by__face:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
