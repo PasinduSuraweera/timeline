@@ -2,7 +2,7 @@
 
 The site reads this for the star count in the nav and the row of people using the
 wave: everyone GitHub has loaded a wave for lately (timeline/seen.py), plus anyone
-code search finds. GitHub is asked at most about once an hour: the CDN keeps each answer.
+code search finds. The CDN keeps each answer for five minutes, so someone new shows up within a few.
 """
 
 import json
@@ -16,7 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 from timeline import seen, usage   # noqa: E402
 
 TOKEN = os.environ.get("GITHUB_TOKEN") or os.environ.get("TIMELINE_GITHUB_TOKEN") or ""
-CACHE_SECONDS = 3600
+CACHE_SECONDS = 300
 
 
 class handler(BaseHTTPRequestHandler):
@@ -29,8 +29,8 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(payload)))
-        self.send_header("Cache-Control", f"public, max-age=300, s-maxage={CACHE_SECONDS}, "
-                                          f"stale-while-revalidate={CACHE_SECONDS * 24}")
+        self.send_header("Cache-Control", f"public, max-age=60, s-maxage={CACHE_SECONDS}, "
+                                          f"stale-while-revalidate={CACHE_SECONDS}")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(payload)
