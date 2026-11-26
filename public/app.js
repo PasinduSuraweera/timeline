@@ -176,23 +176,26 @@
     var who = state.user || "your-username";
     var alt = who + "'s contribution wave";
     var url = imageUrl({ placeholder: true });
-    var profile = "https://github.com/" + who;
+    // The wave links back to Timeline, so people who like it can get their own.
+    var site = location.origin;
 
     if (activeTab === 0) {
-      return "[![" + alt + "](" + url + ")](" + profile + ")";
+      return "[![" + alt + "](" + url + ")](" + site + ")";
     }
     if (activeTab === 1) {
-      return '<a href="' + profile + '">\n'
+      return '<a href="' + site + '">\n'
         + '  <img src="' + url.replace(/&/g, "&amp;") + '" width="100%" alt="' + alt + '">\n'
         + "</a>";
     }
     if (activeTab === 2) {
       var light = imageUrl({ theme: "paper", placeholder: true }).replace(/&/g, "&amp;");
       var dark = url.replace(/&/g, "&amp;");
-      return "<picture>\n"
+      return '<a href="' + site + '">\n'
+        + "<picture>\n"
         + '  <source media="(prefers-color-scheme: light)" srcset="' + light + '">\n'
         + '  <img src="' + dark + '" width="100%" alt="' + alt + '">\n'
-        + "</picture>";
+        + "</picture>\n"
+        + "</a>";
     }
 
     var withs = [["user", "\${{ github.repository_owner }}"], ["out", "assets/timeline.svg"]];

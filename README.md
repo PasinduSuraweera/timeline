@@ -51,7 +51,7 @@ This started as the header on [my profile](https://github.com/PasinduSuraweera) 
 Pick your settings at [timeline-readme.vercel.app](https://timeline-readme.vercel.app/), or write the URL by hand:
 
 ```
-[![my contribution wave](https://timeline-readme.vercel.app/api/timeline?user=YOUR_USERNAME)](https://github.com/YOUR_USERNAME)
+[![my contribution wave](https://timeline-readme.vercel.app/api/timeline?user=YOUR_USERNAME)](https://timeline-readme.vercel.app)
 ```
 
 There is a shorter form for the plain case:

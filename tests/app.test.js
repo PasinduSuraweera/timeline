@@ -121,9 +121,9 @@ check("status invites a username", byId.status.textContent,
 byId.user.value = "  octocat  ";
 byId.user.oninput.call(byId.user);
 check("username is trimmed into the query", ctx.location.hash, "#user=octocat");
-check("markdown snippet links the profile", byId.snippet.textContent,
+check("markdown snippet links back to Timeline", byId.snippet.textContent,
       "[![octocat's contribution wave](https://timeline.example/api/timeline?user=octocat)]"
-      + "(https://github.com/octocat)");
+      + "(https://timeline.example)");
 
 /* ---------- changing a theme and a rider ---------- */
 byId.themes.children[1].onclick();            // ice
